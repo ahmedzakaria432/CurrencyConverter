@@ -16,8 +16,10 @@ namespace CurrencyConverter.Application.Currencies
         {
             CreateMap<CreateCurrencyDto, Currency>();
             CreateMap<UpdateCurrencyDto, Currency>();
-            CreateMap<Currency, CurrencyDto>().ForMember(x=>x.CurrentRate,
-                                              opt=>opt.MapFrom(src=>src.Exchanges.MaxBy(ex=>ex.ExchangeDate).Rate));
+            CreateMap<Currency, CurrencyDto>();
+            CreateProjection<Currency, CurrencyDto>().ForMember(x => x.CurrentRate,
+                                              opt => opt.MapFrom(src => src.Exchanges.OrderBy(ex => ex.ExchangeDate).First().Rate));
+           
         }
     }
 }

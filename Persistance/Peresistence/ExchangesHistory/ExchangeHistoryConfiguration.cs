@@ -1,4 +1,6 @@
 ﻿using CurrencyConverter.Core.ExchangesHistory;
+using CurrencyConverter.Core.Shared;
+using CurrencyConverter.Infrastructure.Peresistence.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -11,9 +13,12 @@ namespace CurrencyConverter.Infrastructure.Peresistence.ExchangesHistory
 {
     public class ExchangeHistoryConfiguration : IEntityTypeConfiguration<ExchangeHistory>
     {
+         
         public void Configure(EntityTypeBuilder<ExchangeHistory> builder)
         {
-           
+           builder.Property(x=>x.ExchangeDate).HasConversion<DateOnlyConverter>()
+                .HasColumnType("date");
+        
         }
     }
 }

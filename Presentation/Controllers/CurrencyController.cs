@@ -14,36 +14,35 @@ namespace CurrencyConverter.Presentation.Controllers
 
         public CurrencyController(ICurrencyService currencyService)
         {
-            this._currencyService = currencyService;
+            _currencyService = currencyService;
         }
-        public Task<CurrencyDto> CreateAsync(CreateCurrencyDto entity)
+        [HttpPost("AddCurrency")]
+        public async Task<ActionResult<CurrencyDto>> Create(CreateCurrencyDto entity)
         {
-            throw new NotImplementedException();
+           return Ok( await _currencyService.CreateAsync(entity));
         }
-
-        public Task DeleteAsync(Guid id)
+        [HttpDelete("DeleteCurrency")]
+        public async Task< ActionResult> Delete(Guid id)
         {
-            throw new NotImplementedException();
+            await _currencyService.DeleteAsync(id);
+            return NoContent();
         }
-
-        public Task<PagedResponse<CurrencyDto>> GetAllAsync(int pageNumber = 1, int pageSize = int.MaxValue)
+        [HttpGet("GetAllCurrencies")]
+        public async Task<ActionResult<PagedResponse<CurrencyDto>>> GetAll(int pageNumber = 1, int pageSize = int.MaxValue)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<CurrencyDto?> GetByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
+           return Ok((await _currencyService.GetAllAsync(pageNumber, pageSize)));
         }
 
-        public Task<CurrencyDto> GetCurrencyByNameAsync(string name)
-        {
-            throw new NotImplementedException();
-        }
 
-        public Task<CurrencyDto> UpdateAsync(Guid id, UpdateCurrencyDto entity)
+        [HttpGet("GetCurrencyByName")]
+        public async Task<ActionResult< CurrencyDto>> GetCurrencyByName(string name)
         {
-            throw new NotImplementedException();
+            return Ok( await _currencyService.GetCurrencyByNameAsync(name));
+        }
+        [HttpPut("UpdateCurrency")]
+        public async Task<ActionResult< CurrencyDto>> Update(Guid id, UpdateCurrencyDto entity)
+        {
+            return Ok(await _currencyService.UpdateAsync(id, entity));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Core.Samples;
+﻿
 
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +11,7 @@ namespace Application.Shared.Interfaces
 {
     public interface IApplicationDbContext
     {
-        DbSet<Sample> Samples { get; set; }
+      
        // DbSet<User> UsersAdditionalData { get; set; }
     }
 }

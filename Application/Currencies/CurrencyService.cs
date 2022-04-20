@@ -1,5 +1,6 @@
 ﻿using Application.Shared;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Core.Shared;
 using Core.Shared.Exceptions;
 using CurrencyConverter.Application.Currencies.Dtos;
@@ -97,7 +98,9 @@ namespace CurrencyConverter.Application.Currencies
 
             var entities = (await _currencyRepository.GetRangeAsync());
 
-            var pagedList = PagedList<CurrencyDto>.ToPagedList(_mapper.Map<IQueryable<CurrencyDto>>( entities), pageNumber, pageSize);
+           
+            var pagedList = PagedList<CurrencyDto>.ToPagedList(_mapper.ProjectTo<CurrencyDto>(entities), pageNumber, pageSize);
+           
             return PreparePagedResponse(pagedList);
         }
 

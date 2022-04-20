@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace CurrencyConverter.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -22,34 +22,68 @@ namespace Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Core.Samples.Sample", b =>
+            modelBuilder.Entity("CurrencyConverter.Core.Currencies.Currency", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("LastModified")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NameOfSample")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<string>("Sign")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Samples");
+                    b.ToTable("Currencies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("9c37c1e5-5e1b-4f06-ad7c-16e7a10d212d"),
+                            IsDeleted = false,
+                            Name = "dollar",
+                            Sign = "$"
+                        });
+                });
+
+            modelBuilder.Entity("CurrencyConverter.Core.ExchangesHistory.ExchangeHistory", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CurrencyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ExchangeDate")
+                        .HasColumnType("date");
+
+                    b.Property<double>("Rate")
+                        .HasColumnType("float");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.ToTable("exchangeHistories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("20d0b2b3-7df8-4dc6-a4ae-d97746f18bd4"),
+                            CurrencyId = new Guid("9c37c1e5-5e1b-4f06-ad7c-16e7a10d212d"),
+                            ExchangeDate = new DateTime(2022, 4, 19, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Rate = 1.0
+                        });
                 });
 
             modelBuilder.Entity("Infrastructure.Identity.ApplicationUser", b =>
@@ -262,6 +296,17 @@ namespace Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("CurrencyConverter.Core.ExchangesHistory.ExchangeHistory", b =>
+                {
+                    b.HasOne("CurrencyConverter.Core.Currencies.Currency", "Currency")
+                        .WithMany("Exchanges")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Currency");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -311,6 +356,11 @@ namespace Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("CurrencyConverter.Core.Currencies.Currency", b =>
+                {
+                    b.Navigation("Exchanges");
                 });
 #pragma warning restore 612, 618
         }

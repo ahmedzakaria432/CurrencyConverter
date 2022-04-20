@@ -1,7 +1,7 @@
-﻿using Core.Samples;
-using Core.Shared;
+﻿using Core.Shared;
 using CurrencyConverter.Core.Currencies;
 using CurrencyConverter.Core.ExchangesHistory;
+using CurrencyConverter.Infrastructure.Peresistence.Helpers;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +15,7 @@ namespace Infrastructure.Peresistence.Data
         {
 
         }
-        public DbSet<Sample> Samples { get; set; }
+        
         public DbSet<Currency> Currencies { get; set; }
         public DbSet<ExchangeHistory> exchangeHistories { get; set; }
 
@@ -44,6 +44,9 @@ namespace Infrastructure.Peresistence.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            DataSeeder.Seed(builder);
+
             base.OnModelCreating(builder);
         }
     }

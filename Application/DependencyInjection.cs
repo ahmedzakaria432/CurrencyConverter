@@ -1,5 +1,4 @@
-﻿using Application.Samples;
-using Application.Samples.Interfaces;
+﻿
 using CurrencyConverter.Application.Currencies;
 using CurrencyConverter.Application.Currencies.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +18,6 @@ namespace CurrencyConverter.Application
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-            services.AddScoped<ISampleService, SampleService>();
 
             services.AddScoped<ICurrencyService, CurrencyService>();
 
