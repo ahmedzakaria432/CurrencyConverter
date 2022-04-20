@@ -29,6 +29,11 @@ namespace Infrastructure.Peresistence.Shared
           return Task.FromResult( dbSet.Remove(entity).Entity);
         }
 
+        public IQueryable<TEntity> GetAsQueryable()
+        {
+           return dbSet.AsNoTracking();
+        }
+
         public Task<TEntity?> GetByIdAsync(Guid id)
         {
             return Task.FromResult(dbSet.AsNoTracking().SingleOrDefault(e => e.Id == id));

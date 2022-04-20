@@ -10,6 +10,6 @@ namespace CurrencyConverter.Core.ExchangesHistory
 {
     public interface ICurrencyRepository:IRepository<Currency>
     {
-        
+       
     }
 }

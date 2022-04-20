@@ -69,8 +69,10 @@ namespace Application.Shared
 
         public virtual async Task<TDto> CreateAsync(TCreateDto entity)
         {
+            
             var crearedEntity = await _repository.InsertAsync(_mapper.Map<TEntity>(entity));
             return _mapper.Map<TDto>(crearedEntity);
+           
         }
 
         public virtual async Task<TDto> UpdateAsync(Guid id, TUpdateDto entity)
@@ -78,8 +80,8 @@ namespace Application.Shared
             var EntityToUpdate = _repository.GetByIdAsync(id);
             if (EntityToUpdate is null) throw new NotFoundException();
             var updatedEntity = await _repository.UpdateAsync(_mapper.Map<TEntity>(entity));
-            return _mapper.Map<TDto>(updatedEntity);
-            
+            return _mapper.Map<TDto>( updatedEntity);
+
         }
     }
 }

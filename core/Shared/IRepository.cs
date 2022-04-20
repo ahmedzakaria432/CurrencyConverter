@@ -9,8 +9,8 @@ namespace Core.Shared
          Task<TEntity> UpdateAsync(TEntity entity);
          Task<TEntity> DeleteAsync(TEntity entity);
          Task<IQueryable<TEntity>> GetRangeAsync(Expression<Func<TEntity,bool>>? expression =null, int pageNumber=1,int pageSize=int.MaxValue);
-         
-         
+
+        IQueryable<TEntity> GetAsQueryable();
 
     }
 }

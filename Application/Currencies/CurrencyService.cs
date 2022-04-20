@@ -64,9 +64,9 @@ namespace CurrencyConverter.Application.Currencies
             var updated = await base.UpdateAsync(id, entity);
             
             await UpdatedRateIfChanged(entity, currency);
-            updated.CurrentRate = entity.CurrentRate;
 
             await _unitOfWork.CommitAsync();
+            updated.CurrentRate = entity.CurrentRate;
 
             return updated;
         }
@@ -87,19 +87,26 @@ namespace CurrencyConverter.Application.Currencies
         public async Task<CurrencyDto> GetCurrencyByNameAsync(string name)
         {
           var currency= (await _currencyRepository.GetRangeAsync()).FirstOrDefault(x=>x.Name==name);
-
+            var dto = _mapper.Map<CurrencyDto>(currency);
+            var lastExchange = currency.Exchanges.OrderByDescending(currency => currency.ExchangeDate).FirstOrDefault();
+            dto.CurrentRate = lastExchange is not null ? lastExchange.Rate : 0;
             return _mapper.Map<CurrencyDto>(currency);
         }
 
         public override async Task<PagedResponse<CurrencyDto>> GetAllAsync(int pageNumber = 1, int pageSize = int.MaxValue)
         {
+     
+            var currencies= _currencyRepository.GetAsQueryable().Select(x => new CurrencyDto()
+            {
+                CurrentRate = x.Exchanges.OrderByDescending(o => o.ExchangeDate).First().Rate,
+                Id = x.Id,
+                Name = x.Name,
+                Sign = x.Sign
 
 
-
-            var entities = (await _currencyRepository.GetRangeAsync());
-
+            });
            
-            var pagedList = PagedList<CurrencyDto>.ToPagedList(_mapper.ProjectTo<CurrencyDto>(entities), pageNumber, pageSize);
+            var pagedList = PagedList<CurrencyDto>.ToPagedList(currencies, pageNumber, pageSize);
            
             return PreparePagedResponse(pagedList);
         }
