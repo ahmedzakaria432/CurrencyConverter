@@ -1,6 +1,8 @@
 ﻿
 using CurrencyConverter.Application.Currencies;
 using CurrencyConverter.Application.Currencies.Interfaces;
+using CurrencyConverter.Application.Shared.Helpers;
+using CurrencyConverter.Application.Shared.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,6 +22,7 @@ namespace CurrencyConverter.Application
 
 
             services.AddScoped<ICurrencyService, CurrencyService>();
+            services.AddScoped<IDateTimeService, DateTimeService>();
 
 
             return services;

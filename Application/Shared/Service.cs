@@ -17,13 +17,15 @@ namespace Application.Shared
     public class Service<TEntity,TDto,TCreateDto,TUpdateDto> : IService<TEntity,TDto, TCreateDto, TUpdateDto> where TEntity : BaseEntity
                                                                 where TDto : BaseDto
     {
-        private readonly IRepository<TEntity> _repository;
-        private readonly IMapper _mapper;
+        protected readonly IRepository<TEntity> _repository;
+        protected readonly IMapper _mapper;
+        protected readonly IUnitOfWork _unitOfWork;
 
-        public Service(IRepository<TEntity> repository,IMapper mapper)
+        public Service(IRepository<TEntity> repository,IMapper mapper,IUnitOfWork unitOfWork)
         {
             this._repository = repository;
             this._mapper = mapper;
+            this._unitOfWork = unitOfWork;
         }
 
         public virtual async Task DeleteAsync(Guid id)
@@ -40,7 +42,7 @@ namespace Application.Shared
 
             var entities = (await _repository.GetRangeAsync(expression));
 
-            var pagedList = PagedList<TEntity>.ToPagedList(entities, pageNumber, pageSize);
+            var pagedList = await PagedList<TEntity>.ToPagedListAsync(entities, pageNumber, pageSize);
 
 
             return PreparePagedResponse(pagedList);
@@ -77,9 +79,9 @@ namespace Application.Shared
 
         public virtual async Task<TDto> UpdateAsync(Guid id, TUpdateDto entity)
         {
-            var EntityToUpdate = _repository.GetByIdAsync(id);
+            var EntityToUpdate = await _repository.GetByIdAsync(id);
             if (EntityToUpdate is null) throw new NotFoundException();
-            var updatedEntity = await _repository.UpdateAsync(_mapper.Map<TEntity>(entity));
+            var updatedEntity = await _repository.UpdateAsync(_mapper.Map(entity,EntityToUpdate));
             return _mapper.Map<TDto>( updatedEntity);
 
         }

@@ -46,7 +46,7 @@ namespace Infrastructure.Peresistence.Data
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             DataSeeder.Seed(builder);
-
+            
             base.OnModelCreating(builder);
         }
     }

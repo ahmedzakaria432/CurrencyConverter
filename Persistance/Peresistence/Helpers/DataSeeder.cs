@@ -27,10 +27,10 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Helpers
             builder.Entity<ExchangeHistory>().HasData(new ExchangeHistory
             {
 
-                Id = Guid.NewGuid(),
+                Id = new Guid("498531C9-AF8C-41A4-9530-D0CAD1FA3674"),
                 Rate = CurrencyConverterDefaults.Rate,
                 CurrencyId = CurrencyConverterDefaults.BaseCurrencyId,
-                ExchangeDate = new DateOnly(2022, 4, 19)
+                ExchangeDate =DateTime.Parse("2022-04-19 14:50:39.9980887"),
 
             });
 

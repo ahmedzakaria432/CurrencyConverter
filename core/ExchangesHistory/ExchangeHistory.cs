@@ -11,8 +11,8 @@ namespace CurrencyConverter.Core.ExchangesHistory
     public class ExchangeHistory:BaseEntity
     {
         public Guid CurrencyId { get; set; }
-        public DateOnly ExchangeDate { get; set; }
+        public DateTime ExchangeDate { get; set; }
         public double Rate { get; set; }
-        public Currency Currency { get; set; }
+        public virtual Currency Currency { get; set; }
     }
 }

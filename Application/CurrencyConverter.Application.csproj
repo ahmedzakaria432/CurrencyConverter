@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="ExchangesHistory\Dtos\" />
-    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

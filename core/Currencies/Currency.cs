@@ -14,7 +14,7 @@ namespace CurrencyConverter.Core.Currencies
         public string Name { get; set; }
         public string Sign { get; set; }
 
-        public List<ExchangeHistory> Exchanges { get; set; }
+        public virtual List<ExchangeHistory> Exchanges { get; set; }
 
     }
 }

@@ -16,7 +16,7 @@ namespace CurrencyConverter.Application.Currencies
         {
             CreateMap<CreateCurrencyDto, Currency>();
             CreateMap<UpdateCurrencyDto, Currency>();
-            CreateMap<Currency, CurrencyDto>();
+            CreateMap<Currency, CurrencyDto>().ReverseMap();
              
         }
     }

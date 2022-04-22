@@ -13,7 +13,7 @@ namespace Infrastructure.Peresistence.Shared
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
         
-        private readonly DbSet<TEntity> dbSet;
+        protected readonly DbSet<TEntity> dbSet;
         private readonly ApplicationDbContext dbContext;
 
         public Repository(ApplicationDbContext dbContext)
@@ -31,12 +31,12 @@ namespace Infrastructure.Peresistence.Shared
 
         public IQueryable<TEntity> GetAsQueryable()
         {
-           return dbSet.AsNoTracking();
+           return dbSet.AsQueryable();
         }
 
-        public Task<TEntity?> GetByIdAsync(Guid id)
+        public async Task<TEntity?> GetByIdAsync(Guid id)
         {
-            return Task.FromResult(dbSet.AsNoTracking().SingleOrDefault(e => e.Id == id));
+            return await dbSet.SingleOrDefaultAsync(e => e.Id == id);
         }
 
         public Task<IQueryable<TEntity>> GetRangeAsync(Expression<Func<TEntity, bool>>? expression = null, int pageNumber = 1, int pageSize = int.MaxValue)

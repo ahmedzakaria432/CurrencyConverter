@@ -44,5 +44,18 @@ namespace CurrencyConverter.Presentation.Controllers
         {
             return Ok(await _currencyService.UpdateAsync(id, entity));
         }
+        [HttpGet("GetHighestNCurrencies")]
+        public async Task<ActionResult<PagedResponse<CurrencyDto>>> GetHighestNCurrencies(int pageNumber = 1, int pageSize = int.MaxValue)
+        {
+            return Ok(await _currencyService.GetHighestNCurrencies(pageNumber,pageSize));
+        }
+
+        [HttpGet("GetLowestNCurrencies")]
+        public async Task<ActionResult<PagedResponse<CurrencyDto>>> GetLowestNCurrencies(int pageNumber = 1, int pageSize = int.MaxValue)
+        {
+            return Ok(await _currencyService.GetLowestNCurrencies(pageNumber, pageSize));
+        }
+
+
     }
 }

@@ -24,7 +24,8 @@ namespace Infrastructure
             services.Configure<Jwt>(cfg => configuration.GetSection("JWT"));
             services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+            options.UseLazyLoadingProxies()
+                   .UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
             );
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddTransient<ExceptionHandlingMiddleware>();

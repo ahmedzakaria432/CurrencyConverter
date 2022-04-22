@@ -16,8 +16,10 @@ namespace CurrencyConverter.Infrastructure.Peresistence.ExchangesHistory
          
         public void Configure(EntityTypeBuilder<ExchangeHistory> builder)
         {
-           builder.Property(x=>x.ExchangeDate).HasConversion<DateOnlyConverter>()
-                .HasColumnType("date");
+            builder.Property(x => x.ExchangeDate).IsRequired();
+            builder.Property(x => x.Rate).IsRequired();
+            builder.HasIndex(x => x.ExchangeDate);
+            builder.HasQueryFilter(x=>!x.Currency.IsDeleted);
         
         }
     }
