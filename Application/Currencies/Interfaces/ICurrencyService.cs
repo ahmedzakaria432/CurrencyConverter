@@ -15,5 +15,6 @@ namespace CurrencyConverter.Application.Currencies.Interfaces
         Task<CurrencyDto> GetCurrencyByNameAsync(string name);
         Task<PagedResponse<CurrencyDto>> GetHighestNCurrencies(int pageNumber = 1, int pageSize = int.MaxValue);
         Task<PagedResponse<CurrencyDto>> GetLowestNCurrencies(int pageNumber, int pageSize);
+        Task<ConvertCurrencyResponseDto> ConvertFromCurrencyToAnother(ConvertCurrencyRequestDto convertCurrency);
     }
 }

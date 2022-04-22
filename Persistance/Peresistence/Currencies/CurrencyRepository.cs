@@ -19,8 +19,9 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Currencies
         public CurrencyRepository(ApplicationDbContext dbContext) : base(dbContext)
         {
             _dbContext = dbContext;
+            
         }
-
+        
         public async Task<(Currency, ExchangeHistory)> GetCurrencyByNameAsync(string name)
         {
             var currency = await _dbContext.Currencies.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(name.ToLower()));
@@ -32,5 +33,7 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Currencies
             return (currency, lastExchange);
 
         }
+
+
     }
 }

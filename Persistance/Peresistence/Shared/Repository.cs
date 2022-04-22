@@ -22,7 +22,7 @@ namespace Infrastructure.Peresistence.Shared
             dbSet=dbContext.Set<TEntity>();
             this.dbContext = dbContext;
         }
-        public Task<TEntity> DeleteAsync(TEntity entity)
+        public virtual Task<TEntity> DeleteAsync(TEntity entity)
         {
             
             
@@ -34,9 +34,9 @@ namespace Infrastructure.Peresistence.Shared
            return dbSet.AsQueryable();
         }
 
-        public async Task<TEntity?> GetByIdAsync(Guid id)
+        public virtual async Task<TEntity?> GetByIdAsync(Guid id)
         {
-            return await dbSet.SingleOrDefaultAsync(e => e.Id == id);
+            return await dbSet.AsQueryable().SingleOrDefaultAsync(e => e.Id == id);
         }
 
         public Task<IQueryable<TEntity>> GetRangeAsync(Expression<Func<TEntity, bool>>? expression = null, int pageNumber = 1, int pageSize = int.MaxValue)

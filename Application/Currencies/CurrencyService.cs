@@ -59,11 +59,11 @@ namespace CurrencyConverter.Application.Currencies
                 }
         public override async Task<CurrencyDto> UpdateAsync(Guid id, UpdateCurrencyDto entity)
         {
-            var currency = await _repository.GetByIdAsync(id);
+            var currency = await _currencyRepository.GetByIdAsync(id);
 
+            await UpdatedRateIfChanged(entity, currency);
             var updated = await base.UpdateAsync(id, entity);
             
-            await UpdatedRateIfChanged(entity, currency);
 
             await _unitOfWork.CommitAsync();
             updated.CurrentRate = entity.CurrentRate;
@@ -97,7 +97,7 @@ namespace CurrencyConverter.Application.Currencies
         public override async Task<PagedResponse<CurrencyDto>> GetAllAsync(int pageNumber = 1, int pageSize = int.MaxValue)
         {
      
-            var currencies= _repository.GetAsQueryable().Select(x => new CurrencyDto()
+            var currencies = _repository.GetAsQueryable().Select(x => new CurrencyDto()
             {
                 CurrentRate = x.Exchanges.OrderByDescending(o => o.ExchangeDate).First().Rate,
                 Id = x.Id,
@@ -106,23 +106,12 @@ namespace CurrencyConverter.Application.Currencies
 
             });
            
-            var pagedList = await PagedList<CurrencyDto>.ToPagedListAsync(currencies, pageNumber, pageSize);
+            
            
-            return pagedList.ToPagedResponse();
+            return (await PagedList<CurrencyDto>.ToPagedListAsync(currencies, pageNumber, pageSize)).ToPagedResponse();
         }
 
-                private static PagedResponse<CurrencyDto> PreparePagedResponse(PagedList<CurrencyDto> pagedList)
-                {
-                    return new PagedResponse<CurrencyDto>()
-                    {
-
-                        TotalCount = pagedList.TotalCount,
-                        CountOfItems = pagedList.Count,
-                        PageNumber = pagedList.CurrentPage,
-                        PageSize = pagedList.PageSize,
-                        Items = pagedList
-                    };
-                }
+            
         public override async Task DeleteAsync(Guid id)
         {
             await base.DeleteAsync(id);
@@ -132,12 +121,12 @@ namespace CurrencyConverter.Application.Currencies
 
         public async Task<PagedResponse<CurrencyDto>> GetHighestNCurrencies(int pageNumber = 1, int pageSize = int.MaxValue)
         {
-            IQueryable<CurrencyDto> currenciesWithHighst = GetCurenciesWithItsLastRate()
-                                                                  .OrderByDescending(x => x.CurrentRate);
+            IQueryable<CurrencyDto> highestCurrencies = GetCurenciesWithItsLastRate()
+                                                                  .OrderBy(x => x.CurrentRate);
 
-            var pagedList = await PagedList<CurrencyDto>.ToPagedListAsync(currenciesWithHighst, pageNumber, pageSize);
+            var highestNCurrencies = await PagedList<CurrencyDto>.ToPagedListAsync(highestCurrencies, pageNumber, pageSize);
 
-            return pagedList.ToPagedResponse();
+            return highestNCurrencies.ToPagedResponse();
 
         }
 
@@ -155,13 +144,53 @@ namespace CurrencyConverter.Application.Currencies
 
         public async Task<PagedResponse<CurrencyDto>> GetLowestNCurrencies(int pageNumber, int pageSize)
         {
-            IQueryable<CurrencyDto> currenciesWithHighst = GetCurenciesWithItsLastRate()
-                                                                .OrderBy(x => x.CurrentRate);
+            IQueryable<CurrencyDto> lowestCurrencies = GetCurenciesWithItsLastRate()
+                                                                .OrderByDescending(x => x.CurrentRate);
 
-            var pagedList = await PagedList<CurrencyDto>.ToPagedListAsync(currenciesWithHighst, pageNumber, pageSize);
+            var lowestN = await PagedList<CurrencyDto>.ToPagedListAsync(lowestCurrencies, pageNumber, pageSize);
 
-            return pagedList.ToPagedResponse();
+            return lowestN.ToPagedResponse();
         }
+
+        public async Task<ConvertCurrencyResponseDto> ConvertFromCurrencyToAnother(ConvertCurrencyRequestDto convertCurrency)
+        {
+            var fromCurrencyWithLastRate = await GetCurenciesWithItsLastRate().SingleOrDefaultAsync(x => x.Id == convertCurrency.FromCurrency);
+            var toCurrencyWithLastRate = await GetCurenciesWithItsLastRate().SingleOrDefaultAsync(x => x.Id == convertCurrency.ToCurrency);
+
+            if (CheckIFCurrenciesExists(fromCurrencyWithLastRate, toCurrencyWithLastRate))
+                throw new NotFoundException("one of your currencies or both was not found please check ids again");
+
+            var ConvertedAmount =ConvertTo(convertCurrency, fromCurrencyWithLastRate, toCurrencyWithLastRate);
+
+            return PrepareConvertCurrencyResponse(convertCurrency, fromCurrencyWithLastRate, toCurrencyWithLastRate, ConvertedAmount);
+
+        }
+
+                    private static bool CheckIFCurrenciesExists(CurrencyDto? fromCurrencyWithLastRate, CurrencyDto? toCurrencyWithLastRate)
+                    {
+                        return (fromCurrencyWithLastRate is null) || (toCurrencyWithLastRate is null);
+                    }
+
+                    private static ConvertCurrencyResponseDto PrepareConvertCurrencyResponse(ConvertCurrencyRequestDto convertCurrency, 
+                        CurrencyDto fromCurrencyWithLastRate, CurrencyDto toCurrencyWithLastRate, double ConvertedAmount)
+                    {
+                        return new()
+                        {
+                            AmountOfFromCurrency = convertCurrency.Amount,
+                            AmountOfToCurrency = ConvertedAmount,
+                            FromCurrency = fromCurrencyWithLastRate.Name,
+                            ToCurrency = toCurrencyWithLastRate.Name,
+                            Summary = $"{convertCurrency.Amount} {fromCurrencyWithLastRate.Name}s = {ConvertedAmount} {toCurrencyWithLastRate.Name}s "
+
+                        };
+                    }
+
+                    private static double ConvertTo(ConvertCurrencyRequestDto convertCurrency,
+                        CurrencyDto fromCurrencyWithLastRate, CurrencyDto toCurrencyWithLastRate)
+                    {
+                        return Math.Round((Convert.ToDouble( convertCurrency.Amount) / fromCurrencyWithLastRate.CurrentRate)
+                                                      * toCurrencyWithLastRate.CurrentRate,5);
+                    }
     }
 
 }

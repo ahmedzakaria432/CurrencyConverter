@@ -55,7 +55,12 @@ namespace CurrencyConverter.Presentation.Controllers
         {
             return Ok(await _currencyService.GetLowestNCurrencies(pageNumber, pageSize));
         }
+        [HttpPost("ConvertFromCurrencyToAnother")]
+        public async Task<ActionResult<ConvertCurrencyResponseDto>> ConvertFromCurrencyToAnother(ConvertCurrencyRequestDto convertCurrency) 
+        {
 
+            return Ok( await _currencyService.ConvertFromCurrencyToAnother(convertCurrency));
+        }
 
     }
 }
