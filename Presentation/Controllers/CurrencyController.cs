@@ -62,5 +62,12 @@ namespace CurrencyConverter.Presentation.Controllers
             return Ok( await _currencyService.ConvertFromCurrencyToAnother(convertCurrency));
         }
 
+        [HttpPost("GetMostNImprovedCurrenciesByDate")]
+        public async Task<ActionResult< PagedResponse<CurrencyDto>>> GetMostNImprovedCurrenciesByDate(GetMostImprovedRequest mostImprovedRequest,
+                                                      int pageNumber = 1, int pageSize = int.MaxValue)
+        {
+            return Ok(await _currencyService.GetMostNImprovedCurrenciesByDate(mostImprovedRequest, pageNumber, pageSize));
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Core.Shared.Exceptions;
+using CurrencyConverter.Application.Currencies.Dtos;
 using CurrencyConverter.Core.Currencies;
 using CurrencyConverter.Core.ExchangesHistory;
 using Infrastructure.Peresistence.Data;
@@ -32,6 +33,56 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Currencies
 
             return (currency, lastExchange);
 
+        }
+
+        public IQueryable GetMostNImprovedCurrenciesByDate(DateTime fromDate, DateTime toDate)
+        {
+            var currenciesWithItsDifference = GetAsQueryable()
+                                     .Select(x => new CurrencyDto()
+                                     {
+                                         Id = x.Id,
+                                         Name = x.Name,
+                                         Sign = x.Sign,
+                                         CurrentRate = (x.Exchanges.Where(x => x.ExchangeDate >= fromDate &&
+                                                                            x.ExchangeDate <= toDate)
+                                                                           .OrderByDescending( o => o.ExchangeDate)
+                                                                           .First().Rate)
+
+                                                         - (x.Exchanges.Where(x => x.ExchangeDate >= fromDate &&
+                                                                            x.ExchangeDate <= toDate).
+                                                                            OrderByDescending(o => o.ExchangeDate)
+                                                                            .Last().Rate),
+
+                                     });
+            currenciesWithItsDifference = currenciesWithItsDifference.Where(x => x.CurrentRate < 0)
+                                                                     .OrderBy(x => x.CurrentRate);
+
+            return currenciesWithItsDifference;
+        }
+
+        public IQueryable GetLeastNImprovedCurrenciesByDate(DateTime fromDate, DateTime toDate)
+        {
+            var currenciesWithItsDifference = GetAsQueryable()
+                                     .Select(x => new CurrencyDto()
+                                     {
+                                         Id = x.Id,
+                                         Name = x.Name,
+                                         Sign = x.Sign,
+                                         CurrentRate = (x.Exchanges.Where(x => x.ExchangeDate >= fromDate &&
+                                                                            x.ExchangeDate <= toDate)
+                                                                           .OrderByDescending(o => o.ExchangeDate)
+                                                                           .First().Rate)
+
+                                                         - (x.Exchanges.Where(x => x.ExchangeDate >= fromDate &&
+                                                                            x.ExchangeDate <= toDate).
+                                                                            OrderByDescending(o => o.ExchangeDate)
+                                                                            .Last().Rate),
+
+                                     });
+            currenciesWithItsDifference = currenciesWithItsDifference.Where(x => x.CurrentRate > 0)
+                                                                     .OrderByDescending(x => x.CurrentRate);
+
+            return currenciesWithItsDifference;
         }
 
 

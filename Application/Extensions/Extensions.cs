@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CurrencyConverter.Application.Extensions
 {
-    public static class DtosExtensions
+    public static class Extensions
     {
 
         public static PagedResponse<T> ToPagedResponse<T>(this PagedList<T> pagedList)

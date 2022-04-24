@@ -20,6 +20,8 @@ using Microsoft.EntityFrameworkCore;
 using CurrencyConverter.Application.Extensions;
 namespace CurrencyConverter.Application.Currencies
 {
+    //todo :: add validator for this class to defend methods
+    //example for using :: validator.CheckIFCurrenciesExists( fromCurrency,toCurrency) to acheive SRP
     public class CurrencyService : Service<Currency, CurrencyDto, CreateCurrencyDto, UpdateCurrencyDto>, ICurrencyService
     {
         private readonly ICurrencyRepository _currencyRepository;
@@ -62,6 +64,7 @@ namespace CurrencyConverter.Application.Currencies
             var currency = await _currencyRepository.GetByIdAsync(id);
 
             await UpdatedRateIfChanged(entity, currency);
+
             var updated = await base.UpdateAsync(id, entity);
             
 
@@ -93,7 +96,7 @@ namespace CurrencyConverter.Application.Currencies
             dto.CurrentRate = lastExchange.Rate;
             return dto;
         }
-
+        //todo ::: may add dto for paginationRequest
         public override async Task<PagedResponse<CurrencyDto>> GetAllAsync(int pageNumber = 1, int pageSize = int.MaxValue)
         {
      
@@ -124,9 +127,9 @@ namespace CurrencyConverter.Application.Currencies
             IQueryable<CurrencyDto> highestCurrencies = GetCurenciesWithItsLastRate()
                                                                   .OrderBy(x => x.CurrentRate);
 
-            var highestNCurrencies = await PagedList<CurrencyDto>.ToPagedListAsync(highestCurrencies, pageNumber, pageSize);
+            var highestNCurrenciesPaged = await PagedList<CurrencyDto>.ToPagedListAsync(highestCurrencies, pageNumber, pageSize);
 
-            return highestNCurrencies.ToPagedResponse();
+            return highestNCurrenciesPaged.ToPagedResponse();
 
         }
 
@@ -171,6 +174,7 @@ namespace CurrencyConverter.Application.Currencies
                         return (fromCurrencyWithLastRate is null) || (toCurrencyWithLastRate is null);
                     }
 
+                    //todo :: we may make this func as extension Method for ConvertCurrencyRequestDto class
                     private static ConvertCurrencyResponseDto PrepareConvertCurrencyResponse(ConvertCurrencyRequestDto convertCurrency, 
                         CurrencyDto fromCurrencyWithLastRate, CurrencyDto toCurrencyWithLastRate, double ConvertedAmount)
                     {
@@ -189,8 +193,24 @@ namespace CurrencyConverter.Application.Currencies
                         CurrencyDto fromCurrencyWithLastRate, CurrencyDto toCurrencyWithLastRate)
                     {
                         return Math.Round((Convert.ToDouble( convertCurrency.Amount) / fromCurrencyWithLastRate.CurrentRate)
-                                                      * toCurrencyWithLastRate.CurrentRate,5);
+                                                      * toCurrencyWithLastRate.CurrentRate,3);
                     }
+
+
+        public async Task<PagedResponse<CurrencyDto>> GetMostNImprovedCurrenciesByDate(GetMostImprovedRequest mostImprovedRequest, 
+                                                       int pageNumber = 1, int pageSize = int.MaxValue) 
+        {
+            DateTime fromDate = mostImprovedRequest.FromDate;
+            DateTime toDate = mostImprovedRequest.ToDate;
+            var currenciesWithItsDifference = _currencyRepository.
+                                                      GetMostNImprovedCurrenciesByDate(fromDate, toDate).OfType<CurrencyDto>();
+
+
+
+            return ( await PagedList<CurrencyDto>.ToPagedListAsync(currenciesWithItsDifference, pageNumber, pageSize)).ToPagedResponse();
+
+
+        }
     }
 
 }
