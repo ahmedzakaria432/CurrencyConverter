@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using FluentValidation;
 
 namespace CurrencyConverter.Application
 {
@@ -19,7 +20,7 @@ namespace CurrencyConverter.Application
         {
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             services.AddScoped<ICurrencyService, CurrencyService>();
             services.AddScoped<IDateTimeService, DateTimeService>();

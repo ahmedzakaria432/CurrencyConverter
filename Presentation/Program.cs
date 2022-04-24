@@ -1,21 +1,27 @@
 
 using CurrencyConverter.Application;
+using FluentValidation.AspNetCore;
 using Infrastructure;
 using Infrastructure.Infrastructure.Helpers.Middlewares;
 using Infrastructure.Peresistence.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
+builder.Services.AddControllers().
+    AddFluentValidation(x => {
 
-builder.Services.AddControllers();
+        x.AutomaticValidationEnabled = false;
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApplication();
+
 
 
 

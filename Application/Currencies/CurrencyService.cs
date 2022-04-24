@@ -63,6 +63,8 @@ namespace CurrencyConverter.Application.Currencies
         {
             var currency = await _currencyRepository.GetByIdAsync(id);
 
+            if (currency is null) throw new NotFoundException(nameof(currency),id);
+
             await UpdatedRateIfChanged(entity, currency);
 
             var updated = await base.UpdateAsync(id, entity);
@@ -74,17 +76,17 @@ namespace CurrencyConverter.Application.Currencies
             return updated;
         }
 
-                private async Task UpdatedRateIfChanged(UpdateCurrencyDto entity, Currency? currency)
+                private async Task UpdatedRateIfChanged(UpdateCurrencyDto entity, Currency currency)
                 {
                     var lastExchange = currency.Exchanges.OrderByDescending(x => x.ExchangeDate).First();
 
-                    if (lastExchange?.Rate != entity.CurrentRate)
+                    if (lastExchange.Rate != entity.CurrentRate || lastExchange.ExchangeDate != entity.DateOfExchange)
                         await _historyRepository.InsertAsync(new()
                         {
                             Currency = currency,
                             CurrencyId = currency.Id,
                             Rate = entity.CurrentRate,
-                            ExchangeDate= _dateTimeService.Now
+                            ExchangeDate= entity.DateOfExchange
                         });
                 }
 
@@ -100,14 +102,7 @@ namespace CurrencyConverter.Application.Currencies
         public override async Task<PagedResponse<CurrencyDto>> GetAllAsync(int pageNumber = 1, int pageSize = int.MaxValue)
         {
      
-            var currencies = _repository.GetAsQueryable().Select(x => new CurrencyDto()
-            {
-                CurrentRate = x.Exchanges.OrderByDescending(o => o.ExchangeDate).First().Rate,
-                Id = x.Id,
-                Name = x.Name,
-                Sign = x.Sign
-
-            });
+            var currencies = GetCurenciesWithItsLastRate();
            
             
            
@@ -197,20 +192,41 @@ namespace CurrencyConverter.Application.Currencies
                     }
 
 
-        public async Task<PagedResponse<CurrencyDto>> GetMostNImprovedCurrenciesByDate(GetMostImprovedRequest mostImprovedRequest, 
+        public async Task<PagedResponse<CurrencyImprovementOrFallenDto>> GetMostNImprovedCurrenciesByDate(GetMostImprovedRequest mostImprovedRequest, 
                                                        int pageNumber = 1, int pageSize = int.MaxValue) 
         {
             DateTime fromDate = mostImprovedRequest.FromDate;
             DateTime toDate = mostImprovedRequest.ToDate;
+
             var currenciesWithItsDifference = _currencyRepository.
-                                                      GetMostNImprovedCurrenciesByDate(fromDate, toDate).OfType<CurrencyDto>();
+                                                      GetMostNImprovedCurrenciesByDate(fromDate, toDate).
+                                                      OfType<CurrencyImprovementOrFallenDto>();
 
 
-
-            return ( await PagedList<CurrencyDto>.ToPagedListAsync(currenciesWithItsDifference, pageNumber, pageSize)).ToPagedResponse();
+            return ( await PagedList<CurrencyImprovementOrFallenDto>.
+                ToPagedListAsync(currenciesWithItsDifference, pageNumber, pageSize)).ToPagedResponse();
 
 
         }
+
+        public async Task<PagedResponse<CurrencyImprovementOrFallenDto>> GetLeastNImprovedCurrenciesByDate(GetMostImprovedRequest mostImprovedRequest,
+                                                   int pageNumber = 1, int pageSize = int.MaxValue)
+        {
+            DateTime fromDate = mostImprovedRequest.FromDate;
+            DateTime toDate = mostImprovedRequest.ToDate;
+
+            var currenciesWithItsDifference = _currencyRepository.
+                                                      GetLeastNImprovedCurrenciesByDate(fromDate, toDate)
+                                                      .OfType<CurrencyImprovementOrFallenDto>();
+
+
+            return (await PagedList<CurrencyImprovementOrFallenDto>.
+                ToPagedListAsync(currenciesWithItsDifference, pageNumber, pageSize)).ToPagedResponse();
+
+
+        }
+
+
     }
 
 }

@@ -56,17 +56,28 @@ namespace CurrencyConverter.Presentation.Controllers
             return Ok(await _currencyService.GetLowestNCurrencies(pageNumber, pageSize));
         }
         [HttpPost("ConvertFromCurrencyToAnother")]
-        public async Task<ActionResult<ConvertCurrencyResponseDto>> ConvertFromCurrencyToAnother(ConvertCurrencyRequestDto convertCurrency) 
+        public async Task<ActionResult<ConvertCurrencyResponseDto>> ConvertFromCurrencyToAnother
+                                                                   (ConvertCurrencyRequestDto convertCurrency) 
         {
 
             return Ok( await _currencyService.ConvertFromCurrencyToAnother(convertCurrency));
         }
 
         [HttpPost("GetMostNImprovedCurrenciesByDate")]
-        public async Task<ActionResult< PagedResponse<CurrencyDto>>> GetMostNImprovedCurrenciesByDate(GetMostImprovedRequest mostImprovedRequest,
+        public async Task<ActionResult< PagedResponse<CurrencyImprovementOrFallenDto>>> GetMostNImprovedCurrenciesByDate
+                                                      (GetMostImprovedRequest mostImprovedRequest,
                                                       int pageNumber = 1, int pageSize = int.MaxValue)
         {
             return Ok(await _currencyService.GetMostNImprovedCurrenciesByDate(mostImprovedRequest, pageNumber, pageSize));
+        }
+
+        [HttpPost("GetLeastNImprovedCurrenciesByDate")]
+        public async Task<ActionResult<PagedResponse<CurrencyImprovementOrFallenDto>>> GetLeastNImprovedCurrenciesByDate
+                                                   (GetMostImprovedRequest mostImprovedRequest,
+                                                   int pageNumber = 1, int pageSize = int.MaxValue)
+        {
+            return Ok(await _currencyService.GetLeastNImprovedCurrenciesByDate(mostImprovedRequest, pageNumber, pageSize));
+
         }
 
     }

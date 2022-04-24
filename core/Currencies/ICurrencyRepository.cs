@@ -12,5 +12,6 @@ namespace CurrencyConverter.Core.ExchangesHistory
     {
         Task<(Currency, ExchangeHistory)> GetCurrencyByNameAsync(string name);
         IQueryable GetMostNImprovedCurrenciesByDate(DateTime fromDate,DateTime toDate);
+        IQueryable GetLeastNImprovedCurrenciesByDate(DateTime fromDate,DateTime toDate);
     }
 }
