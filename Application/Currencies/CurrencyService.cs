@@ -95,13 +95,13 @@ namespace CurrencyConverter.Application.Currencies
             return lastExchange.Rate != entity.CurrentRate || lastExchange.ExchangeDate != entity.DateOfExchange;
         }
 
-        public async Task<CurrencyDto> GetCurrencyByNameAsync(string name)
+        public async Task<PagedResponse< CurrencyDto>> GetCurrencyByNameAsync(string name)
         {
-            var (currency, lastExchange) = await _currencyRepository.GetCurrencyByNameAsync(name); 
+            var matchedCurrencies =  _currencyRepository.GetCurrencyByNameAsync(name).OfType<CurrencyDto>();
 
-            var dto = _mapper.Map<CurrencyDto>(currency);
-            dto.CurrentRate = lastExchange.Rate;
-            return dto;
+
+
+            return (await PagedList<CurrencyDto>.ToPagedListAsync(matchedCurrencies, 1, int.MaxValue)).ToPagedResponse();
         }
         //todo ::: may add dto for paginationRequest
         public override async Task<PagedResponse<CurrencyDto>> GetAllAsync(int pageNumber = 1, int pageSize = int.MaxValue)

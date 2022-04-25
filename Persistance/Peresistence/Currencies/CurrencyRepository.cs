@@ -23,21 +23,25 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Currencies
             
         }
         
-        public async Task<(Currency, ExchangeHistory)> GetCurrencyByNameAsync(string name)
+        public  IQueryable GetCurrencyByNameAsync(string name)
         {
-            var currency = await _dbContext.Currencies.FirstOrDefaultAsync(x => x.Name.ToLower().Contains(name.ToLower()));
+            var currencies = SearchCurrenciesByNameGetLastRate(name);
 
-            if (currency is null) throw new NotFoundException(nameof(currency), name);
-
-            var lastExchange = currency.Exchanges.OrderByDescending(currency => currency.ExchangeDate).
-                FirstOrDefault();
-
-            if (lastExchange is null) throw new BadRequestException("this currency has no Exchanges");
-
-            return (currency, lastExchange);
+            return currencies;
 
         }
+        IQueryable<CurrencyDto> SearchCurrenciesByNameGetLastRate(string name)
+        {
+            return GetAsQueryable().AsNoTracking().Where(x => x.Name.ToLower().Contains(name.ToLower()))
+                .Select(x => new CurrencyDto()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Sign = x.Sign,
+                CurrentRate = x.Exchanges.OrderByDescending(o => o.ExchangeDate).First().Rate,
 
+            });
+        }
         public IQueryable GetMostNImprovedCurrenciesByDate(DateTime fromDate, DateTime toDate)
         {
             var currenciesWithItsDifference = GetCurrenciesWithDifferences(fromDate, toDate);
@@ -78,10 +82,6 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Currencies
                                      });
         }
 
-        private  IOrderedEnumerable<ExchangeHistory> GetCurrenciesBetweenDates(DateTime fromDate, DateTime toDate, Currency x)
-        {
-            return x.Exchanges.Where(x => x.ExchangeDate >= fromDate &&  x.ExchangeDate <= toDate)
-                              .OrderByDescending(o => o.ExchangeDate);
-        }
+   
     }
 }

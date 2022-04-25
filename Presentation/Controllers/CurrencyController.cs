@@ -35,7 +35,7 @@ namespace CurrencyConverter.Presentation.Controllers
 
 
         [HttpGet("GetCurrencyByName")]
-        public async Task<ActionResult< CurrencyDto>> GetCurrencyByName(string name)
+        public async Task<ActionResult<PagedResponse<CurrencyDto>>> GetCurrencyByName(string name)
         {
             return Ok( await _currencyService.GetCurrencyByNameAsync(name));
         }

@@ -12,7 +12,7 @@ namespace CurrencyConverter.Application.Currencies.Interfaces
 {
     public interface ICurrencyService:IService<Currency,CurrencyDto,CreateCurrencyDto,UpdateCurrencyDto>
     {
-        Task<CurrencyDto> GetCurrencyByNameAsync(string name);
+        Task<PagedResponse<CurrencyDto>> GetCurrencyByNameAsync(string name);
         Task<PagedResponse<CurrencyDto>> GetHighestNCurrencies(int pageNumber = 1, int pageSize = int.MaxValue);
         Task<PagedResponse<CurrencyDto>> GetLowestNCurrencies(int pageNumber, int pageSize);
         Task<ConvertCurrencyResponseDto> ConvertFromCurrencyToAnother(ConvertCurrencyRequestDto convertCurrency);
