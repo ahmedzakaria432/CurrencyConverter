@@ -5,6 +5,7 @@ using Core.Shared;
 using Core.Shared.Exceptions;
 using CurrencyConverter.Application.Shared.Dtos;
 using CurrencyConverter.Application.Shared.Helpers;
+using CurrencyConverter.Core.Currencies;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,9 +31,10 @@ namespace Application.Shared
 
         public virtual async Task DeleteAsync(Guid id)
         {
-            var entity= await GetByIdAsync(id);
-            
-            await _repository.DeleteAsync(_mapper.Map<TEntity>(entity));
+            var entity= await _repository.GetByIdAsync(id);
+            if(entity is null) throw new NotFoundException(nameof(Currency), id);
+
+            await _repository.DeleteAsync(entity);
         }
 
         public virtual async Task<PagedResponse<TDto>> GetAllAsync(int pageNumber = 1, int pageSize = int.MaxValue)

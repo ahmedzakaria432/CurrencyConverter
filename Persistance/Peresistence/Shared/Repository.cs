@@ -25,7 +25,6 @@ namespace Infrastructure.Peresistence.Shared
         public virtual Task<TEntity> DeleteAsync(TEntity entity)
         {
             
-            
           return Task.FromResult( dbSet.Remove(entity).Entity);
         }
 
