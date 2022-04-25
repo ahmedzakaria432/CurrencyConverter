@@ -20,7 +20,7 @@ namespace CurrencyConverter.Application
         {
 
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
-            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+            services.AddValidatorsFromAssemblyContaining(typeof(DependencyInjection));
 
             services.AddScoped<ICurrencyService, CurrencyService>();
             services.AddScoped<IDateTimeService, DateTimeService>();

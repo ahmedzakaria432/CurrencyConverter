@@ -65,7 +65,7 @@ namespace CurrencyConverter.Application.Currencies
 
             if (currency is null) throw new NotFoundException(nameof(currency),id);
 
-            await UpdatedRateIfChanged(entity, currency);
+            await InsertExchangeIfNeeded(entity, currency);
 
             var updated = await base.UpdateAsync(id, entity);
             
@@ -76,19 +76,24 @@ namespace CurrencyConverter.Application.Currencies
             return updated;
         }
 
-                private async Task UpdatedRateIfChanged(UpdateCurrencyDto entity, Currency currency)
+                private async Task InsertExchangeIfNeeded(UpdateCurrencyDto entity, Currency currency)
                 {
                     var lastExchange = currency.Exchanges.OrderByDescending(x => x.ExchangeDate).First();
 
-                    if (lastExchange.Rate != entity.CurrentRate || lastExchange.ExchangeDate != entity.DateOfExchange)
+                        if (CheckIfWeNeedInsertExchange(entity, lastExchange))
                         await _historyRepository.InsertAsync(new()
                         {
                             Currency = currency,
                             CurrencyId = currency.Id,
                             Rate = entity.CurrentRate,
-                            ExchangeDate= entity.DateOfExchange
+                            ExchangeDate = entity.DateOfExchange
                         });
                 }
+
+        private static bool CheckIfWeNeedInsertExchange(UpdateCurrencyDto entity, ExchangeHistory lastExchange)
+        {
+            return lastExchange.Rate != entity.CurrentRate || lastExchange.ExchangeDate != entity.DateOfExchange;
+        }
 
         public async Task<CurrencyDto> GetCurrencyByNameAsync(string name)
         {

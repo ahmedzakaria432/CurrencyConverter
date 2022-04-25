@@ -41,6 +41,7 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Currencies
         public IQueryable GetMostNImprovedCurrenciesByDate(DateTime fromDate, DateTime toDate)
         {
             var currenciesWithItsDifference = GetCurrenciesWithDifferences(fromDate, toDate);
+            
             currenciesWithItsDifference = currenciesWithItsDifference.Where(x => x.ChangeRate < 0)
                                                                      .OrderBy(x => x.ChangeRate);
 
@@ -50,7 +51,7 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Currencies
         public IQueryable GetLeastNImprovedCurrenciesByDate(DateTime fromDate, DateTime toDate)
         {
             IQueryable<CurrencyImprovementOrFallenDto> currenciesWithItsDifference = 
-                                                                                GetCurrenciesWithDifferences(fromDate, toDate);
+                                                         GetCurrenciesWithDifferences(fromDate, toDate);
 
             currenciesWithItsDifference = currenciesWithItsDifference.Where(x => x.ChangeRate > 0)
                                                                      .OrderByDescending(x => x.ChangeRate);
@@ -60,7 +61,7 @@ namespace CurrencyConverter.Infrastructure.Peresistence.Currencies
 
         private IQueryable<CurrencyImprovementOrFallenDto> GetCurrenciesWithDifferences(DateTime fromDate, DateTime toDate)
         {
-            return GetAsQueryable()
+                                 return GetAsQueryable()
                                      .Select(x => new CurrencyImprovementOrFallenDto()
                                      {
                                          Id = x.Id,

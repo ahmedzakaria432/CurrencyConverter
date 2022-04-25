@@ -14,8 +14,8 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddControllers().
     AddFluentValidation(x => {
-
-        x.AutomaticValidationEnabled = false;
+      //  x.RegisterValidatorsFromAssemblyContaining(typeof(CurrencyConverter.Application.DependencyInjection));
+        x.AutomaticValidationEnabled = true;
     });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
